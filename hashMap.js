@@ -43,6 +43,20 @@ function HashMap () {
       }
       return buckets;
     },
+
+    get: (key) => {
+      let index = hash(key) % size;
+      validateIndex(index);
+
+      let currentNode = buckets[index];
+      while (currentNode) {
+        if (currentNode.key == key) return currentNode.value;
+        if (!currentNode.next) break;
+        currentNode = currentNode.next;
+      }
+
+      return null;
+    },
   };
 };
 
@@ -51,4 +65,9 @@ function Node (key = null, value = null, next = null) {
 };
 
 let newMap = HashMap();
-console.log(newMap.buckets);
+newMap.set("Omega", "first");
+newMap.set("Alpha", "second");
+newMap.set("hello", "third");
+newMap.set("world", "fourth");
+console.log(newMap.get("something"));
+// console.log(newMap.buckets);
