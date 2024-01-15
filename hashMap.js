@@ -1,5 +1,5 @@
 function HashMap () {
-  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size);
+  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size), length = 0;
   for (let bucket = 0; bucket < size; bucket++) buckets[bucket] = Node();
 
   function hash (inputStr) {
@@ -23,7 +23,7 @@ function HashMap () {
   };
 
   return {
-    buckets, hash,
+    buckets, hash, length: () => length,
     set: (key, value) => {
       if (populated / size >= loadFactor) expandMap();
       let index = hash(key) % size;
@@ -33,15 +33,16 @@ function HashMap () {
       while (currentNode) {
         if (currentNode.key) {
           if (currentNode.key == key) return currentNode.value = value;
-          if (!currentNode.next) currentNode.next = Node(key, value)
-          else currentNode = currentNode.next;
+          if (!currentNode.next) {
+            length++;
+            return currentNode.next = Node(key, value);
+          }; currentNode = currentNode.next;
         } else {
           currentNode.key = key;
           currentNode.value = value;
-          break;
-        }
+          length++;
+        };
       }
-      return buckets;
     },
 
     get: (key) => {
@@ -57,6 +58,10 @@ function HashMap () {
 
       return null;
     },
+
+    has: (key) => {
+
+    },
   };
 };
 
@@ -69,5 +74,5 @@ newMap.set("Omega", "first");
 newMap.set("Alpha", "second");
 newMap.set("hello", "third");
 newMap.set("world", "fourth");
-console.log(newMap.get("something"));
+
 // console.log(newMap.buckets);
