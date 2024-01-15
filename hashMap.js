@@ -1,8 +1,6 @@
 function HashMap () {
-  let size = 16, loadFactor = 0.75;
-
-  const buckets = new Array(size);
-  for (let bucket = 0; bucket < size; bucket++) buckets[bucket] = { key: null, value: null}
+  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size);
+  for (let bucket = 0; bucket < size; bucket++) buckets[bucket] = Node();
 
   function hash (inputStr) {
     let code = 0;
@@ -16,22 +14,41 @@ function HashMap () {
     if (index < 0 || index >= size) throw new Error("Out of bound index");
   };
 
+  function expandMap () {
+    size = size * 2;
+    let newMap = new Array(size);
+    for (let i = 0; i < size; i++) newMap[i] = buckets[i];
+
+    buckets = newMap;
+  };
+
   return {
-    hash,
+    buckets, hash,
     set: (key, value) => {
+      if (populated / size >= loadFactor) expandMap();
       let index = hash(key) % size;
       validateIndex(index);
 
-      if (buckets[index].key == key) buckets[index].value = value
-      else {
-        buckets[index].key = key;
-        buckets[index].value = value;
-      };
-
+      let currentNode = buckets[index];
+      while (currentNode) {
+        if (currentNode.key) {
+          if (currentNode.key == key) return currentNode.value = value;
+          if (!currentNode.next) currentNode.next = Node(key, value)
+          else currentNode = currentNode.next;
+        } else {
+          currentNode.key = key;
+          currentNode.value = value;
+          break;
+        }
+      }
       return buckets;
     },
   };
 };
 
+function Node (key = null, value = null, next = null) {
+  return { key, value, next };
+};
+
 let newMap = HashMap();
-console.log(newMap.set("Omega", "firstSet"), newMap.set("Omega", "overwrittenSet") );
+console.log(newMap.buckets);
