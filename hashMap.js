@@ -1,5 +1,5 @@
 function HashMap () {
-  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size), length = 0;
+  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size), length = 0, keysValuePairs = [];
   for (let bucket = 0; bucket < size; bucket++) buckets[bucket] = Node();
 
   function hash (inputStr) {
@@ -23,7 +23,8 @@ function HashMap () {
   };
 
   function retrieve (key, get) {
-    let index = hash(key) % size, result = get == false ? false : null;
+    const index = hash(key) % size;
+    let result = get == false ? false : null;
     validateIndex(index);
 
     let currentNode = buckets[index];
@@ -42,7 +43,7 @@ function HashMap () {
     buckets, hash, length: () => length,
     set: (key, value) => {
       if (populated / size >= loadFactor) expandMap();
-      let index = hash(key) % size;
+      const index = hash(key) % size;
       validateIndex(index);
 
       let currentNode = buckets[index];
@@ -64,6 +65,23 @@ function HashMap () {
     get: (key) => retrieve(key, true),
     has: (key) => retrieve(key, false),
 
+    remove: (key) => {
+      const index = hash(key) % size;
+      validateIndex(index);
+
+      let removed = false, currentNode = buckets[index], prevNode = null;
+      while (currentNode) {
+        if (currentNode.key == key) {
+          if (prevNode) prevNode.next = currentNode.next
+          else buckets[index] = currentNode.next ? currentNode.next : Node();
+          removed = true;
+          break;
+        }; prevNode = currentNode;
+        currentNode = currentNode.next;
+      }
+
+      return removed;
+    },
   };
 };
 
@@ -76,5 +94,6 @@ newMap.set("Omega", "first");
 newMap.set("Alpha", "second");
 newMap.set("hello", "third");
 newMap.set("world", "fourth");
-console.log(newMap.buckets, newMap.get("Omega"));
+// console.log(newMap.buckets, newMap.get("Omega"));
+console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
 // console.log(newMap.buckets);
