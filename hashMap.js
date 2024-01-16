@@ -82,6 +82,8 @@ function HashMap () {
 
       return removed;
     },
+
+    clear: () => { for (let i = 0; i < size; i++) buckets[i] = Node() },
   };
 };
 
@@ -94,6 +96,9 @@ newMap.set("Omega", "first");
 newMap.set("Alpha", "second");
 newMap.set("hello", "third");
 newMap.set("world", "fourth");
-// console.log(newMap.buckets, newMap.get("Omega"));
+newMap.set("openai", "fifth");
+newMap.remove("world");
+newMap.clear();
+console.log(newMap.buckets, newMap.get("Omega"));
 console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
 // console.log(newMap.buckets);
