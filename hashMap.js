@@ -1,5 +1,7 @@
 function HashMap () {
-  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size), length = 0, keysValuePairs = [];
+  let size = 16, populated = 0, loadFactor = 0.875, buckets = new Array(size),
+  length = 0, keys = [], values = [], keysValuePairs = [];
+
   for (let bucket = 0; bucket < size; bucket++) buckets[bucket] = Node();
 
   function hash (inputStr) {
@@ -40,30 +42,55 @@ function HashMap () {
   };
 
   return {
-    buckets, hash, length: () => length,
+    buckets, hash, length: () => length, keys, values, entries: keysValuePairs,
     set: (key, value) => {
       if (populated / size >= loadFactor) expandMap();
       const index = hash(key) % size;
       validateIndex(index);
 
       let currentNode = buckets[index];
+
       while (currentNode) {
         if (currentNode.key) {
-          if (currentNode.key == key) return currentNode.value = value;
+          if (currentNode.key == key) {
+            currentNode.value = values[currentNode.index] = keysValuePairs[currentNode.index][1] = value;
+            break;
+          };
+
           if (!currentNode.next) {
+            currentNode.next = Node(key, value, length);
+            const index = currentNode.next.index;
+
+            keys[index] = key;
+            values[index] = value;
+            keysValuePairs[index] = [key, value];
+
             length++;
-            return currentNode.next = Node(key, value);
+            break;
           }; currentNode = currentNode.next;
         } else {
           currentNode.key = key;
           currentNode.value = value;
+          currentNode.index = length;
+
+          const index = currentNode.index;
+
+          keys[index] = key;
+          values[index] = value;
+          keysValuePairs[index] = [key, value];
+
           length++;
+          break;
         };
       }
     },
 
     get: (key) => retrieve(key, true),
     has: (key) => retrieve(key, false),
+    clear: () => {
+      for (let i = 0; i < size; i++) buckets[i] = Node();
+      keys = []; values = []; keysValuePairs = [];
+    },
 
     remove: (key) => {
       const index = hash(key) % size;
@@ -82,13 +109,11 @@ function HashMap () {
 
       return removed;
     },
-
-    clear: () => { for (let i = 0; i < size; i++) buckets[i] = Node() },
   };
 };
 
-function Node (key = null, value = null, next = null) {
-  return { key, value, next };
+function Node (key = null, value = null, index = null, next = null) {
+  return { key, value, index, next };
 };
 
 let newMap = HashMap();
@@ -97,8 +122,9 @@ newMap.set("Alpha", "second");
 newMap.set("hello", "third");
 newMap.set("world", "fourth");
 newMap.set("openai", "fifth");
-newMap.remove("world");
+// newMap.remove("world");
 newMap.clear();
-console.log(newMap.buckets, newMap.get("Omega"));
-console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
+// console.log(newMap.buckets, newMap.get("Omega"));
+// console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
 // console.log(newMap.buckets);
+console.log(newMap.buckets, newMap.keys, newMap.values, newMap.entries);
