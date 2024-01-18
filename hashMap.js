@@ -42,7 +42,7 @@ function HashMap () {
   };
 
   return {
-    buckets, hash, length: () => length, keys, values, entries: keysValuePairs,
+    buckets, hash, length: () => length, keys: () => keys, values: () => values, entries: () => keysValuePairs,
     set: (key, value) => {
       if (populated / size >= loadFactor) expandMap();
       const index = hash(key) % size;
@@ -89,7 +89,7 @@ function HashMap () {
     has: (key) => retrieve(key, false),
     clear: () => {
       for (let i = 0; i < size; i++) buckets[i] = Node();
-      keys = []; values = []; keysValuePairs = [];
+      keys = values = keysValuePairs = [];
     },
 
     remove: (key) => {
@@ -97,13 +97,27 @@ function HashMap () {
       validateIndex(index);
 
       let removed = false, currentNode = buckets[index], prevNode = null;
+
       while (currentNode) {
         if (currentNode.key == key) {
-          if (prevNode) prevNode.next = currentNode.next
+          if (prevNode) prevNode.next = currentNode.next;
           else buckets[index] = currentNode.next ? currentNode.next : Node();
+          
+          keys.splice(currentNode.index, 1);
+          values.splice(currentNode.index, 1);
+          keysValuePairs.splice(currentNode.index, 1);
+
+          while (currentNode.next) {
+            currentNode.next.index = currentNode.index;
+            currentNode = currentNode.next;
+          }
+
+          length--;
           removed = true;
           break;
-        }; prevNode = currentNode;
+        };
+
+        prevNode = currentNode;
         currentNode = currentNode.next;
       }
 
@@ -117,14 +131,15 @@ function Node (key = null, value = null, index = null, next = null) {
 };
 
 let newMap = HashMap();
-newMap.set("Omega", "first");
+newMap.set("Omega", "First");
 newMap.set("Alpha", "second");
 newMap.set("hello", "third");
 newMap.set("world", "fourth");
 newMap.set("openai", "fifth");
+newMap.set("Omega", "first");
 // newMap.remove("world");
-newMap.clear();
+// newMap.clear();
 // console.log(newMap.buckets, newMap.get("Omega"));
 // console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
 // console.log(newMap.buckets);
-console.log(newMap.buckets, newMap.keys, newMap.values, newMap.entries);
+console.log(newMap.buckets, newMap.keys(), newMap.values(), newMap.entries());
