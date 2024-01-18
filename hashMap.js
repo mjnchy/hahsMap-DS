@@ -130,16 +130,19 @@ function Node (key = null, value = null, index = null, next = null) {
   return { key, value, index, next };
 };
 
-let newMap = HashMap();
-newMap.set("Omega", "First");
-newMap.set("Alpha", "second");
-newMap.set("hello", "third");
-newMap.set("world", "fourth");
-newMap.set("openai", "fifth");
-newMap.set("Omega", "first");
+
+// Tests:
+// let newMap = HashMap();
+// newMap.set("Omega", "First");
+// newMap.set("Alpha", "second");
+// newMap.set("hello", "third");
+// newMap.set("world", "fourth");
+// newMap.set("openai", "fifth");
+// newMap.set("Omega", "first");
+// console.log(newMap.buckets, newMap.length())
 // newMap.remove("world");
 // newMap.clear();
 // console.log(newMap.buckets, newMap.get("Omega"));
 // console.log(newMap.buckets, newMap.remove("Omega"), newMap.buckets);
 // console.log(newMap.buckets);
-console.log(newMap.buckets, newMap.keys(), newMap.values(), newMap.entries());
+// console.log(newMap.buckets, newMap.keys(), newMap.values(), newMap.entries(), newMap.length());
